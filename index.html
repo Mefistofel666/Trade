@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Что ценнее</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            overflow: hidden; /* Скрываем скролл */
+            background: linear-gradient(270deg, #a1c4fd, #c2e9fb); /* Голубой градиент */
+        }
+        h1 {
+            text-align: center;
+            color: #4a90e2;
+            margin-top: 20px;
+            font-size: 2.5rem;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px auto;
+            max-width: 800px;
+            position: relative;
+            z-index: 1; /* Поднимаем контейнер над фоном */
+        }
+        .box {
+            border: 2px solid #4a90e2;
+            border-radius: 10px;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+            cursor: pointer;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+            position: relative;
+            z-index: 1; /* Поднимаем боксы над фоном */
+        }
+        .box:hover {
+            transform: scale(1.05);
+        }
+        .item-list {
+            display: none;
+            position: absolute;
+            border: 1px solid #4a90e2;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .item {
+            cursor: pointer;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item:hover {
+            background: #f0f4f8;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+            position: relative;
+            z-index: 1; /* Поднимаем кнопку над фоном */
+        }
+        button:hover {
+            background: #357ab8;
+        }
+        #result {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1; /* Поднимаем результат над фоном */
+        }
+        .scale {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            position: relative;
+            margin-top: 20px;
+            overflow: hidden;
+            z-index: 1; /* Поднимаем шкалу над фоном */
+        }
+        .filler {
+            height: 100%;
+            border-radius: 5px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width 0.3s;
+            background: #4a90e2;
+        }
+        .divider {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to right,
+                transparent,
+                transparent 48%,
+                #ccc 48%,
+                #ccc 50%
+            );
+        }
+        .search-container {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .search-container input {
+            padding: 5px;
+            width: 80%;
+            max-width: 300px;
+            border: 1px solid #4a90e2;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1; /* Поднимаем футер над фоном */
+        }
+        .condition-select {
+            margin-top: 10px;
+        }
+        .close-button {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 20px;
+            color: #4a90e2;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Что ценнее</h1>
+<div class="container">
+    <div class="box" id="box1">
+        <div class="search-container">
+            <input type="text" id="searchInput1" placeholder="Поиск">
+        </div>
+        <span id="selectedItem1">Не выбрано</span>
+        <div id="condition1" class="condition-select hidden">
+            <label for="conditionSelect1">Состояние:</label>
+            <select id="conditionSelect1">
+                <option value="1">Идеал</option>
+                <option value="2">Потёртое</option>
+                <option value="3">Не очень</option>
+            </select>
+        </div>
+    </div>
+    <div class="box" id="box2">
+        <div class="search-container">
+            <input type="text" id="searchInput2" placeholder="Поиск">
+        </div>
+        <span id="selectedItem2">Не выбрано</span>
+        <div id="condition2" class="condition-select hidden">
+            <label for="conditionSelect2">Состояние:</label>
+            <select id="conditionSelect2">
+                <option value="1">Идеал</option>
+                <option value="2">Потёртое</option>
+                <option value="3">Не очень</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div id="itemList1" class="item-list">
+    <span class="close-button" id="closeButton1">✖</span>
+</div>
+<div id="itemList2" class="item-list">
+    <span class="close-button" id="closeButton2">✖</span>
+</div>
+
+<button id="evaluateButton">Оценить</button>
+<p id="result"></p>
+
+<div class="scale" id="scale">
+    <div class="filler" id="filler" style="width: 0%;"></div>
+    <div class="divider"></div>
+</div>
+
+<div class="footer">
+    <p>Эта программа сделана для барахолки <a href="https://t.me/baraholkaNVKZ142" target="_blank">Новокузнецк</a>.</p>
+    <p>Создатель: Mefisto ----> @N0nameses</p>
+</div>
+
+<script>
+    const items = [
+        { name: "Minifit", value: 0.50 },
+        { name: "Viki", value: 0.60 },
+        { name: "Bar", value: 0.60 },
+        { name: "Charon baby", value: 1 },
+        { name: "Charon baby+", value: 1.50 },
+        { name: "Santi", value: 2 },
+        { name: "Aegis Hiro", value: 3 },
+        { name: "Aegis 2", value: 3.50 },
+        { name: "Aegis 3", value: 4 },
+        { name: "Aegis le", value: 3 },
+        { name: "Aegis boost", value: 5 },
+        { name: "Aegis boost pro", value: 5.50 },
+        { name: "Aegis boost pro 2", value: 6 },
+        { name: "Aegis e100", value: 8 },
+        { name: "Aegis one", value: 2 },
+        { name: "Pasito 1", value: 2.50 },
+        { name: "Pasito 2", value: 5.50 },
+        { name: "Pasito mini", value: 3.50 },
+        { name: "Xros 1", value: 3 },
+        { name: "Xros 1 mini", value: 2.50 },
+        { name: "Xros 2", value: 3.50 },
+        { name: "Xros 2 mini", value: 3 },
+        { name: "Xros 3", value: 4 },
+        { name: "Xros 3 mini", value: 3.90 },
+        { name: "Manto aio", value: 5.50 },
+        { name: "Mato aio +", value: 5 },
+        { name: "Knight 80", value: 5.50 }
+    ];
+
+    let selectedItems = [[], []];  // Массивы для хранения выбранных предметов
+    let selectedNames = [[], []];    // Массивы для хранения названий выбранных предметов
+    let selectedConditions = [[], []]; // Массивы для хранения состояния предметов
+
+    // Функция для добавления предметов в списки
+    function populateItemLists() {
+        const itemList1 = document.getElementById('itemList1');
+        const itemList2 = document.getElementById('itemList2');
+
+        items.forEach(item => {
+            // Создаем элемент списка для каждого предмета
+            const itemElement1 = document.createElement('div');
+            itemElement1.className = 'item';
+            itemElement1.setAttribute('data-value', item.value);
+            itemElement1.setAttribute('data-name', item.name);
+            itemElement1.textContent = item.name;
+
+            const itemElement2 = document.createElement('div');
+            itemElement2.className = 'item';
+            itemElement2.setAttribute('data-value', item.value);
+            itemElement2.setAttribute('data-name', item.name);
+            itemElement2.textContent = item.name;
+
+            // Добавляем элемент в соответствующий список
+            itemList1.appendChild(itemElement1);
+            itemList2.appendChild(itemElement2);
+        });
+    }
+
+    // Заполняем списки предметами
+    populateItemLists();
+
+    document.getElementById('box1').onclick = function() {
+        toggleItemList('itemList1');
+    };
+
+    document.getElementById('box2').onclick = function() {
+        toggleItemList('itemList2');
+    };
+
+    function toggleItemList(listId) {
+        const itemList = document.getElementById(listId);
+        itemList.style.display = itemList.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Закрытие списка при нажатии на крестик
+    document.getElementById('closeButton1').onclick = function() {
+        document.getElementById('itemList1').style.display = 'none';
+    };
+
+    document.getElementById('closeButton2').onclick = function() {
+        document.getElementById('itemList2').style.display = 'none';
+    };
+
+    document.querySelectorAll('.item').forEach(item => {
+        item.onclick = function(event) {
+            const boxId = event.target.closest('.item-list').id === 'itemList1' ? 0 : 1;
+            const itemName = this.getAttribute('data-name');
+            const itemValue = parseFloat(this.getAttribute('data-value'));
+
+            selectedItems[boxId].push(itemValue);
+            selectedNames[boxId].push(itemName);
+
+            // Сохраняем состояние
+            const conditionSelect = document.getElementById(`conditionSelect${boxId + 1}`);
+            selectedConditions[boxId].push(conditionSelect.value);
+
+            document.getElementById(`selectedItem${boxId + 1}`).innerText = selectedNames[boxId].join(', ');
+
+            // Показываем выпадающий список состояния
+            document.getElementById(`condition${boxId + 1}`).classList.remove('hidden');
+
+            // Скрываем список после выбора
+            toggleItemList(event.target.closest('.item-list').id);
+            updateResult();
+        };
+    });
+
+    document.getElementById('evaluateButton').onclick = function() {
+        evaluate();
+    };
+
+    function updateResult() {
+        document.getElementById('result').innerText = `Выбранные предметы: ${selectedNames[0].join(', ') || 'не выбрано'} и ${selectedNames[1].join(', ') || 'не выбрано'}`;
+        document.getElementById('filler').style.width = '0%'; 
+    }
+
+    function evaluate() {
+        if (selectedItems[0].length === 0 || selectedItems[1].length === 0) {
+            alert('Выберите предметы для оценки.');
+            return;
+        }
+
+        const totalValue1 = calculateTotalValue(0);
+        const totalValue2 = calculateTotalValue(1);
+
+        let resultText;
+        if (totalValue1 > totalValue2) {
+            resultText = 'Группа 1 дороже';
+            const percentage = Math.min((totalValue1 / totalValue2) * 100, 100);
+            document.getElementById('filler').style.width = percentage + '%';
+        } else if (totalValue1 < totalValue2) {
+            resultText = 'Группа 2 дороже';
+            document.getElementById('filler').style.width = '100%'; 
+        } else {
+            resultText = 'Группы равны по стоимости';
+            document.getElementById('filler').style.width = '50%'; 
+        }
+        document.getElementById('result').innerText = resultText;
+    }
+
+    function calculateTotalValue(boxId) {
+        return selectedItems[boxId].reduce((total, itemValue, index) => {
+            const condition = selectedConditions[boxId][index];
+            let adjustedValue = itemValue;
+
+            if (condition === "1") { // Идеал
+                adjustedValue = itemValue; // Цена остается прежней
+            } else if (condition === "2") { // Потёртое
+                adjustedValue = itemValue - 0.30; // Цена падает на 0.30
+            } else if (condition === "3") { // Не очень
+                adjustedValue = itemValue - 1; // Цена падает на 1
+            }
+
+            return total + adjustedValue;
+        }, 0);
+    }
+
+    document.getElementById('searchInput1').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const items = document.querySelectorAll('#itemList1 .item');
+
+        items.forEach(item => {
+            const itemName = item.getAttribute('data-name').toLowerCase();
+            item.style.display = itemName.includes(filter) ? 'block' : 'none';
+        });
+    });
+
+    document.getElementById('searchInput2').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const items = document.querySelectorAll('#itemList2 .item');
+
+        items.forEach(item => {
+            const itemName = item.getAttribute('data-name').toLowerCase();
+            item.style.display = itemName.includes(filter) ? 'block' : 'none';
+        });
+    });
+</script>
+
+</body>
+</html>
